@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Performance Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-title">Student Performance Dashboard</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Add Subjects (Global) -->
+    <div class="card">
+      <h2 class="brand-title" style="font-size:1.05rem">Section 1: Add Subjects</h2>
+      <form id="subjectForm" class="mt-16">
+        <div class="form-row">
+          <div>
+            <label class="label" for="newSubjectName">Subject Name</label>
+            <input id="newSubjectName" class="input" type="text" placeholder="e.g., Mathematics" />
+          </div>
+          <div style="align-self:end">
+            <button type="submit" class="button btn-primary">Add Subject</button>
+          </div>
+        </div>
+      </form>
+      <div class="mt-16">
+        <strong class="label">Current Subjects</strong>
+        <div id="subjectChips" class="chips"></div>
+      </div>
+    </div>
+
+    <!-- Section 2: Add/Update Students with Marks -->
+    <div class="card">
+      <h2 class="brand-title" style="font-size:1.05rem">Section 2: Add / Update Student Marks</h2>
+      <form id="studentForm" class="mt-16">
+        <label class="label" for="studentName">Student Name</label>
+        <input id="studentName" class="input" type="text" placeholder="e.g., Alex Johnson" />
+
+        <div class="mt-16">
+          <div class="label">Marks (for existing subjects)</div>
+          <div id="subjectsContainer"></div>
+        </div>
+
+        <div class="mt-16">
+          <button type="submit" class="button btn-primary">Save Student</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Section 3: View Averages & Grades (Sorted) -->
+    <div class="card">
+      <h2 class="brand-title" style="font-size:1.05rem">Section 3: Class Results</h2>
+      <div class="grid grid-4 mt-16">
+        <div class="card" style="padding:16px">
+          <div class="label">Total Students</div>
+          <div id="statTotal">-</div>
+        </div>
+        <div class="card" style="padding:16px">
+          <div class="label">Average Score</div>
+          <div id="statAverage">-</div>
+        </div>
+        <div class="card" style="padding:16px">
+          <div class="label">Highest Avg</div>
+          <div id="statHighest">-</div>
+        </div>
+        <div class="card" style="padding:16px">
+          <div class="label">Lowest Avg</div>
+          <div id="statLowest">-</div>
+        </div>
+      </div>
+
+      <div class="mt-16">
+        <table class="table">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Edit Student</div>
+        <button id="modalCloseBtn" class="modal-close">×</button>
+      </div>
+      <form id="editForm">
+        <label class="label" for="editStudentName">Student Name</label>
+        <input id="editStudentName" class="input" type="text" />
+
+        <div class="mt-16">
+          <div class="label">Subjects</div>
+          <div id="editSubjectsContainer"></div>
+          <button type="button" id="addEditSubjectBtn" class="add-subject mt-16">+ Add Subject</button>
+        </div>
+
+        <div class="mt-16 actions">
+          <button type="submit" class="button btn-update">Update</button>
+          <button type="button" class="button btn-cancel" id="cancelEditBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    // Stats refresh
+    function refreshStats() {
+      const students = JSON.parse(localStorage.getItem('students_v2') || '[]');
+      const avgs = students.map(s => s.average);
+      const total = students.length;
+      const avg = avgs.length ? (avgs.reduce((a,b)=>a+b,0)/avgs.length).toFixed(2) : '-';
+      const highest = avgs.length ? Math.max(...avgs).toFixed(2) : '-';
+      const lowest = avgs.length ? Math.min(...avgs).toFixed(2) : '-';
+      document.getElementById('statTotal').textContent = total || '-';
+      document.getElementById('statAverage').textContent = avg;
+      document.getElementById('statHighest').textContent = highest;
+      document.getElementById('statLowest').textContent = lowest;
+    }
+    window.addEventListener('storage', () => { refreshStats(); renderSubjectsInputs(); });
+    document.addEventListener('DOMContentLoaded', () => { refreshStats(); renderSubjectsInputs(); });
+    document.getElementById('cancelEditBtn').addEventListener('click', () => document.getElementById('editModal').classList.remove('show'));
+  </script>
+</body>
+</html>
